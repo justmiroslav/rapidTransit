@@ -16,15 +16,15 @@ public class TripDAOImpl implements TripDAO {
     }
 
     @Override
-    public Trip findById(int id) {
+    public Trip findById(long tripId) {
         String sql = "SELECT * FROM trips WHERE trip_id = ?";
-        return executeQuery(sql, id);
+        return findTrip(sql, tripId);
     }
 
     @Override
     public Trip findByRouteAndDate(int routeId, LocalDate date) {
         String sql = "SELECT * FROM trips WHERE route_id = ? AND trip_date = ?";
-        return executeQuery(sql, routeId, date);
+        return findTrip(sql, routeId, date);
     }
 
     @Override
@@ -53,22 +53,30 @@ public class TripDAOImpl implements TripDAO {
         }
     }
 
-    private Trip executeQuery(String sql, Object... parameters) {
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            for (int i = 0; i < parameters.length; i++) {
-                pstmt.setObject(i + 1, parameters[i]);
-            }
-            ResultSet rs = pstmt.executeQuery();
+    private Trip findTrip(String sql, Object... params) {
+        try (PreparedStatement pstmt = prepareStatementForQuery(sql, params); ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) {
-                return new Trip(rs.getInt("trip_id"), rs.getInt("route_id"),
-                        rs.getInt("bus_id"), rs.getDate("trip_date").toLocalDate(),
-                        rs.getTime("departure_time").toLocalTime(), rs.getTime("arrival_time").toLocalTime(),
-                        List.of((Integer[]) rs.getArray("available_seats").getArray()));
+                return createTripFromResultSet(rs);
             }
         } catch (SQLException e) {
             System.out.println("Error executing query: " + e.getMessage());
         }
         return null;
+    }
+
+    private PreparedStatement prepareStatementForQuery(String sql, Object... params) throws SQLException {
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        for (int i = 0; i < params.length; i++) {
+            pstmt.setObject(i + 1, params[i]);
+        }
+        return pstmt;
+    }
+
+    private Trip createTripFromResultSet(ResultSet rs) throws SQLException {
+        return new Trip(rs.getLong("trip_id"), rs.getInt("route_id"),
+                rs.getInt("bus_id"), rs.getDate("trip_date").toLocalDate(),
+                rs.getTime("departure_time").toLocalTime(), rs.getTime("arrival_time").toLocalTime(),
+                List.of((Integer[]) rs.getArray("available_seats").getArray()));
     }
 
     private void initializeSequence() {

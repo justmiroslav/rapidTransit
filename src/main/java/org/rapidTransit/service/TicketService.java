@@ -11,23 +11,25 @@ import java.util.AbstractMap.SimpleEntry;
 import java.time.Year;
 
 public class TicketService {
-    private final TicketDAO ticketDAO;
-    private final TripDAO tripDAO;
+    private final User user;
     private final RouteDAO routeDAO;
     private final BusDAO busDAO;
+    private final TripDAO tripDAO;
+    private final TicketDAO ticketDAO;
     private final Scanner scanner;
     private final int COEFFICIENT;
 
-    public TicketService() {
-        this.ticketDAO = new TicketDAOImpl();
-        this.tripDAO = new TripDAOImpl();
-        this.routeDAO = new RouteDAOImpl();
-        this.busDAO = new BusDAOImpl();
+    public TicketService(User user, RouteDAO routeDAO, BusDAO busDAO, TripDAO tripDAO, TicketDAO ticketDAO) {
+        this.user = user;
+        this.routeDAO = routeDAO;
+        this.busDAO = busDAO;
+        this.tripDAO = tripDAO;
+        this.ticketDAO = ticketDAO;
         this.scanner = new Scanner(System.in);
         this.COEFFICIENT = 150;
     }
 
-    public float purchaseTicketProcess(User user) {
+    public float purchaseTicketProcess() {
         SimpleEntry<String, String> cities = selectCities(routeDAO.getUniqueCities());
         if (cities == null) return 0;
 
@@ -43,10 +45,10 @@ public class TicketService {
         int seatNumber = selectSeat(trip);
         if (seatNumber == -1) return 0;
 
-        if (!checkBalanceAndCalculatePrice(user, route)) return 0;
+        if (!checkBalanceAndCalculatePrice(route)) return 0;
 
         float price = calculatePrice(route);
-        purchaseAndDisplayTicket(user.getId(), seatNumber, price, bus, trip, route);
+        purchaseAndDisplayTicket(seatNumber, price, bus, trip, route);
         return price;
     }
 
@@ -102,7 +104,7 @@ public class TicketService {
         return seatNumber;
     }
 
-    private boolean checkBalanceAndCalculatePrice(User user, Route route) {
+    private boolean checkBalanceAndCalculatePrice(Route route) {
         float price = calculatePrice(route);
         boolean isConfirmed = confirmPayment(price);
         if (!isConfirmed) return false;
@@ -123,8 +125,8 @@ public class TicketService {
         return response.equals("yes");
     }
 
-    private void purchaseAndDisplayTicket(long userId, int seatNumber, float price, Bus bus, Trip trip, Route route) {
-        long ticketId = purchaseTicket(trip, userId, seatNumber, price);
+    private void purchaseAndDisplayTicket(int seatNumber, float price, Bus bus, Trip trip, Route route) {
+        long ticketId = purchaseTicket(trip, seatNumber, price);
         displayTicketInfo(ticketId, price, seatNumber, bus.getBusNumber(), trip, route);
     }
 
@@ -142,9 +144,9 @@ public class TicketService {
         return route.getTravelTime() * COEFFICIENT;
     }
 
-    private long purchaseTicket(Trip trip, long userId, int seatNumber, float price) {
+    private long purchaseTicket(Trip trip, int seatNumber, float price) {
         updateAvailableSeats(trip, seatNumber);
-        Ticket ticket = new Ticket(0, trip.getTripId(), userId, seatNumber, price);
+        Ticket ticket = new Ticket(0, trip.getTripId(), user.getId(), seatNumber, price);
         ticketDAO.save(ticket);
         return ticket.getTicketId();
     }

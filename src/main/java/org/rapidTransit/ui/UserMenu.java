@@ -4,20 +4,19 @@ import org.rapidTransit.model.User;
 import org.rapidTransit.service.UserService;
 import org.rapidTransit.service.TicketService;
 import org.rapidTransit.service.TripService;
+import org.rapidTransit.dao.*;
 
 public class UserMenu {
     private final User user;
     private final TicketService ticketService;
     private final UserService userService;
     private final TripService tripService;
-    private final int MIN_CHOICE = 1;
-    private final int MAX_CHOICE = 7;
 
-    public UserMenu(User user) {
+    public UserMenu(User user, RouteDAO routeDAO, BusDAO busDAO, TripDAO tripDAO, UserDAO userDAO, TicketDAO ticketDAO, RatingDAO ratingDAO) {
         this.user = user;
-        this.userService = new UserService(user);
-        this.ticketService = new TicketService();
-        this.tripService = new TripService();
+        this.userService = new UserService(user, userDAO);
+        this.ticketService = new TicketService(user, routeDAO, busDAO, tripDAO, ticketDAO);
+        this.tripService = new TripService(user, routeDAO, busDAO, tripDAO, ticketDAO, ratingDAO);
     }
 
     public boolean show() {
@@ -26,7 +25,7 @@ public class UserMenu {
 
         while (true) {
             displayMainMenu();
-            int choice = userService.getValidChoice(MIN_CHOICE, MAX_CHOICE);
+            int choice = userService.getValidChoice(1, 7);
 
             if (choice == 1) handlePurchaseTickets();
             else if (choice == 2) handleUpdateBalance();
@@ -45,7 +44,7 @@ public class UserMenu {
     }
 
     private void handlePurchaseTickets() {
-        float price = ticketService.purchaseTicketProcess(user);
+        float price = ticketService.purchaseTicketProcess();
         if (price > 0) userService.updateBalance(-price);
     }
 
@@ -54,13 +53,11 @@ public class UserMenu {
     }
 
     private void handleTripsHistory() {
-//        tripService.displayUserTripsHistory(user);
-        System.out.println("Trips history is not implemented yet.");
+        tripService.tripsHistoryProcess();
     }
 
     private void handleManageAccount() {
-//        userService.manageUserAccount();
-        System.out.println("Manage account is not implemented yet.");
+        userService.manageAccountProcess();
     }
 
     private String getAboutUsText() {
