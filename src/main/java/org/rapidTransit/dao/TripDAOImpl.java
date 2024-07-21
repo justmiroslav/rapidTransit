@@ -6,6 +6,7 @@ import org.rapidTransit.model.Trip;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 public class TripDAOImpl implements TripDAO {
     private final Connection connection;
@@ -25,6 +26,18 @@ public class TripDAOImpl implements TripDAO {
     public Trip findByRouteAndDate(int routeId, LocalDate date) {
         String sql = "SELECT * FROM trips WHERE route_id = ? AND trip_date = ?";
         return findTrip(sql, routeId, date);
+    }
+
+    @Override
+    public List<Trip> findByRouteId(int routeId) {
+        String sql = "SELECT * FROM trips WHERE route_id = ? ORDER BY trip_id ASC";
+        return findTrips(sql, routeId);
+    }
+
+    @Override
+    public List<Trip> getLastTrips() {
+        String sql = "SELECT * FROM trips WHERE trip_date IN (SELECT DISTINCT trip_date FROM trips ORDER BY trip_date DESC LIMIT 2) ORDER BY trip_date ASC";
+        return findTrips(sql);
     }
 
     @Override
@@ -51,6 +64,41 @@ public class TripDAOImpl implements TripDAO {
         } catch (SQLException e) {
             System.out.println("Error updating available seats: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void update(Trip trip) {
+        String sql = "UPDATE trips SET route_id = ?, bus_id = ?, trip_date = ?, departure_time = ?, arrival_time = ?, available_seats = ? WHERE trip_id = ?";
+        try (PreparedStatement pstmt = prepareStatement(connection.prepareStatement(sql), trip)) {
+            pstmt.setLong(7, trip.getTripId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating trip: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void save(Trip trip) {
+        String sql = "INSERT INTO trips (route_id, bus_id, trip_date, departure_time, arrival_time, available_seats) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = prepareStatement(connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS), trip)) {
+            pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                trip.setTripId(rs.getLong(1));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error saving trip: " + e.getMessage());
+        }
+    }
+
+    private PreparedStatement prepareStatement(PreparedStatement pstmt, Trip trip) throws SQLException {
+        pstmt.setInt(1, trip.getRouteId());
+        pstmt.setInt(2, trip.getBusId());
+        pstmt.setDate(3, Date.valueOf(trip.getTripDate()));
+        pstmt.setTime(4, Time.valueOf(trip.getDepartureTime()));
+        pstmt.setTime(5, Time.valueOf(trip.getArrivalTime()));
+        pstmt.setArray(6, connection.createArrayOf("INTEGER", trip.getAvailableSeats().toArray()));
+        return pstmt;
     }
 
     private Trip findTrip(String sql, Object... params) {
@@ -86,5 +134,17 @@ public class TripDAOImpl implements TripDAO {
         } catch (SQLException e) {
             System.out.println("Error initializing sequence: " + e.getMessage());
         }
+    }
+
+    private List<Trip> findTrips(String sql, Object... params) {
+        List<Trip> trips = new ArrayList<>();
+        try (PreparedStatement pstmt = prepareStatementForQuery(sql, params); ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                trips.add(createTripFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing query: " + e.getMessage());
+        }
+        return trips;
     }
 }

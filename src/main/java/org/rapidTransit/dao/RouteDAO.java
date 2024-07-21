@@ -8,4 +8,6 @@ public interface RouteDAO {
     Route findById(int id);
     Route findRouteId(String departureCity, String arrivalCity);
     List<String> getUniqueCities();
+    List<Route> getAllRoutes();
+    void update(Route route);
 }

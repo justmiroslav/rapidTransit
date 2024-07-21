@@ -41,6 +41,36 @@ public class RouteDAOImpl implements RouteDAO {
         return cities;
     }
 
+    @Override
+    public List<Route> getAllRoutes() {
+        List<Route> routes = new ArrayList<>();
+        String sql = "SELECT * FROM routes ORDER BY route_id ASC";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                routes.add(new Route(rs.getInt("route_id"), rs.getString("departure_city"),
+                        rs.getString("arrival_city"), rs.getFloat("travel_time")));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting all routes: " + e.getMessage());
+        }
+        return routes;
+    }
+
+    @Override
+    public void update(Route route) {
+        String sql = "UPDATE routes SET departure_city = ?, arrival_city = ?, travel_time = ? WHERE route_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, route.getDepartureCity());
+            pstmt.setString(2, route.getArrivalCity());
+            pstmt.setFloat(3, route.getTravelTime());
+            pstmt.setInt(4, route.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating route: " + e.getMessage());
+        }
+    }
+
     private Route executeQuery(String sql, Object... parameters) {
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             for (int i = 0; i < parameters.length; i++) {

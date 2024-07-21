@@ -4,8 +4,8 @@ public class Rating {
     private int ratingId;
     private final long tripId;
     private final long userId;
-    private int rating;
-    private String comment;
+    private final int rating;
+    private final String comment;
 
     public Rating(int ratingId, long tripId, long userId, int rating, String comment) {
         this.ratingId = ratingId;
@@ -35,15 +35,7 @@ public class Rating {
         return rating;
     }
 
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-
     public String getComment() {
         return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 }

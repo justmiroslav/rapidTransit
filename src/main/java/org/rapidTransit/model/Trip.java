@@ -8,7 +8,7 @@ public class Trip {
     private long tripId;
     private final int routeId;
     private final int busId;
-    private LocalDate tripDate;
+    private final LocalDate tripDate;
     private LocalTime departureTime;
     private LocalTime arrivalTime;
     private List<Integer> availableSeats;
@@ -41,10 +41,6 @@ public class Trip {
 
     public LocalDate getTripDate() {
         return tripDate;
-    }
-
-    public void setTripDate(LocalDate tripDate) {
-        this.tripDate = tripDate;
     }
 
     public LocalTime getDepartureTime() {

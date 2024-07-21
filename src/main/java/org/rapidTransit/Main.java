@@ -23,7 +23,7 @@ public class Main {
             args = new String[0];
 
             if (person instanceof Admin) {
-                if (!new AdminMenu((Admin) person).show()) {
+                if (!new AdminMenu((Admin) person, routeDAO, busDAO, tripDAO, userDAO, ratingDAO).show()) {
                     break;
                 }
             } else if (person instanceof User) {

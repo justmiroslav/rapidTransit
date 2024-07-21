@@ -27,14 +27,15 @@ public class UserMenu {
             displayMainMenu();
             int choice = userService.getValidChoice(1, 7);
 
-            if (choice == 1) handlePurchaseTickets();
-            else if (choice == 2) handleUpdateBalance();
-            else if (choice == 3) handleTripsHistory();
-            else if (choice == 4) handleManageAccount();
-            else if (choice == 5) System.out.println(getAboutUsText());
-            else if (choice == 6) { System.out.println("Logging out..."); return true; }
-            else if (choice == 7) { System.out.println("Thank you for using RapidTransit. Goodbye!"); return false; }
-            else System.out.println("Invalid option. Please try again.");
+            switch (choice) {
+                case 1 -> handlePurchaseTickets();
+                case 2 -> handleUpdateBalance();
+                case 3 -> handleTripsHistory();
+                case 4 -> handleManageAccount();
+                case 5 -> System.out.println(getAboutUsText());
+                case 6 -> { System.out.println("Logging out..."); return true; }
+                case 7 -> { System.out.println("Thank you for using RapidTransit. Goodbye!"); return false; }
+            }
         }
     }
 

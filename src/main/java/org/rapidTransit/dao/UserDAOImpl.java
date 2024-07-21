@@ -4,6 +4,8 @@ import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.model.User;
 
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class UserDAOImpl implements UserDAO {
     private final Connection connection;
@@ -21,6 +23,21 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public User findById(long id) {
         return getUser("SELECT * FROM users WHERE user_id = ?", id);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users ORDER BY user_id ASC";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                users.add(createFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting all users: " + e.getMessage());
+        }
+        return users;
     }
 
     @Override
@@ -57,18 +74,20 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
-    private User getUser(String query, Object param) {
+    private User createFromResultSet(ResultSet rs) throws SQLException {
+        return new User(rs.getInt("user_id"), rs.getString("user_email"),
+                rs.getString("user_password"), rs.getString("user_name"),
+                rs.getFloat("balance"), rs.getBoolean("is_blocked"));
+    }
+
+    private User getUser(String query, Object... params) {
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            if (param instanceof String) {
-                pstmt.setString(1, (String) param);
-            } else if (param instanceof Long) {
-                pstmt.setLong(1, (Long) param);
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
             }
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return new User(rs.getInt("user_id"), rs.getString("user_email"),
-                        rs.getString("user_password"), rs.getString("user_name"),
-                        rs.getFloat("balance"), rs.getBoolean("is_blocked"));
+                return createFromResultSet(rs);
             }
         } catch (SQLException e) {
             System.out.println("Error finding user: " + e.getMessage());
