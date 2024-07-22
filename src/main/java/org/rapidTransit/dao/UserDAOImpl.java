@@ -1,6 +1,5 @@
 package org.rapidTransit.dao;
 
-import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.model.User;
 
 import java.sql.*;
@@ -10,8 +9,8 @@ import java.util.ArrayList;
 public class UserDAOImpl implements UserDAO {
     private final Connection connection;
 
-    public UserDAOImpl() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
+    public UserDAOImpl(Connection connection) {
+        this.connection = connection;
         initializeSequence();
     }
 

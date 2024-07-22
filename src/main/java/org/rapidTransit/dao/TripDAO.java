@@ -11,7 +11,6 @@ public interface TripDAO {
     List<Trip> findByRouteId(int routeId);
     List<Trip> getLastTrips();
     boolean tripExists(int routeId, LocalDate date);
-    void updateAvailableSeats(Trip trip);
     void update(Trip trip);
     void save(Trip trip);
 }

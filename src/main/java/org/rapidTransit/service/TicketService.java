@@ -127,7 +127,7 @@ public class TicketService {
 
     private void purchaseAndDisplayTicket(int seatNumber, float price, Bus bus, Trip trip, Route route) {
         long ticketId = purchaseTicket(trip, seatNumber, price);
-        displayTicketInfo(ticketId, price, seatNumber, bus.getBusNumber(), trip, route);
+        displayTicketInfo(ticketId, price, seatNumber, bus.busNumber(), trip, route);
     }
 
     private boolean validateCities(List<String> availableCities, String departureCity, String arrivalCity) {
@@ -136,7 +136,7 @@ public class TicketService {
 
     private void displayTripInfo(Bus bus, Trip trip) {
         System.out.println("\n--- Quick info about the trip ---");
-        System.out.println("Bus number: " + bus.getBusNumber() + ", Trip time: (" + trip.getDepartureTime() + " - " + trip.getArrivalTime() + ")");
+        System.out.println("Bus number: " + bus.busNumber() + ", Trip time: (" + trip.getDepartureTime() + " - " + trip.getArrivalTime() + ")");
         System.out.println("Available seats: " + String.join(", ", trip.getAvailableSeats().toString()));
     }
 
@@ -153,7 +153,7 @@ public class TicketService {
 
     private void updateAvailableSeats(Trip trip, int seatNumber) {
         trip.setAvailableSeats(trip.getAvailableSeats().stream().filter(seat -> seat != seatNumber).toList());
-        tripDAO.updateAvailableSeats(trip);
+        tripDAO.update(trip);
     }
 
     private void displayTicketInfo(long ticketId, float price, int seatNumber, String busNumber, Trip trip, Route route) {

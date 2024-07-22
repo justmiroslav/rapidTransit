@@ -5,6 +5,7 @@ import org.rapidTransit.dao.AdminDAO;
 import org.rapidTransit.model.User;
 import org.rapidTransit.model.Admin;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class AuthenticationService {
@@ -19,66 +20,79 @@ public class AuthenticationService {
     }
 
     public Object authenticate(String[] params) {
-        String[] credentials = requestCredentials(params);
-        if (credentials == null || credentials.length < 2) return null;
+        if (params.length == 1 || params.length > 4) return null;
 
-        Object authResult = authenticateUserOrAdmin(credentials[0], credentials[1]);
-        if (authResult instanceof String[]) {
-            return registerNewUser(credentials[0], credentials[1]);
-        }
-        return authResult;
+        List<String> credentials = requestCredentials(params);
+        if (credentials == null) return null;
+
+        Object authResult = authenticateUserOrAdmin(credentials);
+        return (authResult instanceof List) ? registerNewUser(credentials) : authResult;
     }
 
-    private String[] requestCredentials(String[] params) {
+    private List<String> requestCredentials(String[] params) {
         String email, password;
+        List<String> paramsList;
 
-        if (params.length == 2) {
-            email = params[0];
-            password = params[1];
+        if (params.length >= 2) {
+            if (params[0].equals("exit") || params[1].equals("exit")) return null;
+            paramsList = List.of(params);
         } else {
-            System.out.print("Enter email: ");
-            email = scanner.nextLine();
-            if (email.equals("exit")) return null;
-
-            System.out.print("Enter password: ");
-            password = scanner.nextLine();
-            if (password.equals("exit")) return null;
+            email = promptUser("Enter your email: "); password = promptUser("Enter your password: ");
+            if (email == null || password == null) return null;
+            paramsList = List.of(email, password);
         }
-        return new String[]{email, password};
+
+        return paramsList;
     }
 
-    private Object authenticateUserOrAdmin(String email, String password) {
+    private Object authenticateUserOrAdmin(List<String> credentials) {
+        String email = credentials.get(0);
+        String password = credentials.get(1);
+
         Admin admin = adminDAO.findByEmail(email);
         User user = userDAO.findByEmail(email);
 
+        if (admin != null && admin.getPassword().equals(password)) return admin;
+        if (user != null && user.getPassword().equals(password)) {
+            return user.isBlocked() ? handleBlockedUser() : user;
+        }
+
         if (admin != null || user != null) {
-            if ((admin != null && admin.getPassword().equals(password)) || (user != null && user.getPassword().equals(password))) {
-                if (user != null && user.isBlocked()) {
-                    System.out.println("Your account is blocked. Get out!");
-                    return null;
-                }
-                return admin != null ? admin : user;
-            }
             System.out.println("Invalid password for an existing email");
             return null;
         }
-        return new String[]{email, password};
+
+        return credentials;
     }
 
-    private User registerNewUser(String email, String password) {
-        System.out.print("Confirm your password: ");
-        String confirmPassword = scanner.nextLine();
+    private User registerNewUser(List<String> credentials) {
+        String email = credentials.get(0);
+        String password = credentials.get(1);
 
+        if (email.equals("exit") || password.equals("exit")) return null;
+
+        String confirmPassword = (credentials.size() > 2) ? credentials.get(2) : promptUser("Confirm your password: ");
         if (!password.equals(confirmPassword)) {
             System.out.println("Passwords do not match. Registration failed.");
             return null;
         }
 
-        System.out.print("Enter your name: ");
-        String name = scanner.nextLine();
+        String name = (credentials.size() > 3) ? credentials.get(3) : promptUser("Enter your name: ");
+        if (name == null) return null;
 
         User newUser = new User(0, email, password, name, 0.0f, false);
         userDAO.save(newUser);
         return newUser;
+    }
+
+    private String promptUser(String message) {
+        System.out.print(message);
+        String input = scanner.nextLine();
+        return input.equals("exit") ? null : input;
+    }
+
+    private Object handleBlockedUser() {
+        System.out.println("Your account is blocked. Get out!");
+        return null;
     }
 }

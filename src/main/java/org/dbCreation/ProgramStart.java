@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class ProgramStart {
-    public static void main(String[] args) {
+    public static void main() {
         try (Connection conn = DatabaseConnection.getInstance().getConnection(); Statement stmt = conn.createStatement()) {
             createTables(stmt);
 

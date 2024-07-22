@@ -29,28 +29,23 @@ public class UserMenu {
 
             switch (choice) {
                 case 1 -> handlePurchaseTickets();
-                case 2 -> handleUpdateBalance();
-                case 3 -> handleTripsHistory();
-                case 4 -> handleManageAccount();
-                case 5 -> System.out.println(getAboutUsText());
-                case 6 -> { System.out.println("Logging out..."); return true; }
-                case 7 -> { System.out.println("Thank you for using RapidTransit. Goodbye!"); return false; }
+                case 2 -> handleTripsHistory();
+                case 3 -> handleManageAccount();
+                case 4 -> System.out.println(getAboutUsText());
+                case 5 -> { System.out.println("Logging out..."); return true; }
+                case 6 -> { System.out.println("Thank you for using RapidTransit. Goodbye!"); return false; }
             }
         }
     }
 
     private void displayMainMenu() {
-        System.out.println("\n1-Purchase Tickets; 2-Update balance; 3-Trips History; 4-Manage Account; 5-About Us; 6-Log out; 7-Exit");
+        System.out.println("\n1-Purchase Tickets; 2-Trips History; 3-Manage Account; 4-About Us; 5-Log out; 6-Exit");
         System.out.print("Please select an option: ");
     }
 
     private void handlePurchaseTickets() {
         float price = ticketService.purchaseTicketProcess();
         if (price > 0) userService.updateBalance(-price);
-    }
-
-    private void handleUpdateBalance() {
-        userService.updateBalanceProcess();
     }
 
     private void handleTripsHistory() {

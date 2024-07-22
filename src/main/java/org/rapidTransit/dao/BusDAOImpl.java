@@ -1,15 +1,13 @@
 package org.rapidTransit.dao;
 
-import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.model.Bus;
-
 import java.sql.*;
 
 public class BusDAOImpl implements BusDAO {
     private final Connection connection;
 
-    public BusDAOImpl() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
+    public BusDAOImpl(Connection connection) {
+        this.connection = connection;
     }
 
     @Override

@@ -63,8 +63,7 @@ public class TripService {
     }
 
     private void displayTicketDetails() {
-        System.out.print("Enter ticket id: ");
-        long ticketId = Long.parseLong(scanner.nextLine());
+        long ticketId = getValidId("Enter ticket id: ");
         Ticket ticket = ticketDAO.findById(ticketId);
         if (ticket == null) {
             System.out.println("Ticket not found");
@@ -80,12 +79,12 @@ public class TripService {
         System.out.println("\n--- Ticket Information ---");
         System.out.printf("Ticket number: %d, Price: %.2f UAH\n", ticket.getTicketId(), ticket.getTicketPrice());
         System.out.printf("Route: %s - %s, Date: %s, (%s - %s)\n", route.getDepartureCity(), route.getArrivalCity(), trip.getTripDate(), trip.getDepartureTime(), trip.getArrivalTime());
-        System.out.printf("Bus number: %s, Seat: %d\n", bus.getBusNumber(), ticket.getSeatNumber());
+        System.out.printf("Bus number: %s, Seat: %d\n", bus.busNumber(), ticket.getSeatNumber());
     }
 
     private void rateTrip() {
-        System.out.print("Enter trip id: ");
-        long tripId = Long.parseLong(scanner.nextLine());
+        long tripId = getValidId("Enter trip id: ");
+        if (tripId == 0) return;
         if (ticketDAO.findByTripAndUser(tripId, user.getId()) == null) {
             System.out.println("You haven't been in this trip");
             return;
@@ -95,6 +94,16 @@ public class TripService {
         String comment = getComment();
         ratingDAO.save(new Rating(0, tripId, user.getId(), rating, comment));
         System.out.println("Thank you for sharing your trip experience!");
+    }
+
+    private long getValidId(String message) {
+        System.out.print(message);
+        try {
+            return Long.parseLong(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            return 0;
+        }
     }
 
     private String getComment() {

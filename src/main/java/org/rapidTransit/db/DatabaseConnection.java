@@ -10,7 +10,7 @@ public class DatabaseConnection {
 
     private DatabaseConnection() {
         try {
-            this.connection = DriverManager.getConnection(System.getenv("DB_URL"),
+            this.connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/rapidTransit",
                     System.getenv("DB_USER"), System.getenv("DB_PASS"));
         } catch (SQLException e) {
             System.out.println("Database Connection Creation Failed : " + e.getMessage());

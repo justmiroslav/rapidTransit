@@ -1,6 +1,5 @@
 package org.rapidTransit.dao;
 
-import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.model.Route;
 
 import java.sql.*;
@@ -10,8 +9,8 @@ import java.util.List;
 public class RouteDAOImpl implements RouteDAO {
     private final Connection connection;
 
-    public RouteDAOImpl() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
+    public RouteDAOImpl(Connection connection) {
+        this.connection = connection;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package org.rapidTransit.dao;
 
-import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.model.Trip;
 
 import java.sql.*;
@@ -11,8 +10,8 @@ import java.util.ArrayList;
 public class TripDAOImpl implements TripDAO {
     private final Connection connection;
 
-    public TripDAOImpl() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
+    public TripDAOImpl(Connection connection) {
+        this.connection = connection;
         initializeSequence();
     }
 
@@ -52,18 +51,6 @@ public class TripDAOImpl implements TripDAO {
             System.out.println("Error checking if trip exists: " + e.getMessage());
         }
         return false;
-    }
-
-    @Override
-    public void updateAvailableSeats(Trip trip) {
-        String sql = "UPDATE trips SET available_seats = ? WHERE trip_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setArray(1, connection.createArrayOf("INTEGER", trip.getAvailableSeats().toArray()));
-            pstmt.setLong(2, trip.getTripId());
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating available seats: " + e.getMessage());
-        }
     }
 
     @Override

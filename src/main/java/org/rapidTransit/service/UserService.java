@@ -22,18 +22,19 @@ public class UserService {
         return Utils.getValidChoice(min, max, scanner);
     }
 
-    public void updateBalance(float amount) {
-        user.setBalance(user.getBalance() + amount);
+    public void updateUserName(String newName) {
+        user.setName(newName);
         userDAO.update(user);
     }
 
-    public void updateBalanceProcess() {
-        displayBalanceInfo("Your current");
-        float amount = getValidAmount();
-        if (amount > 0) {
-            updateBalance(amount);
-            displayBalanceInfo("Balance updated successfully. Your new");
-        }
+    public void updateUserPassword(String newPassword) {
+        user.setPassword(newPassword);
+        userDAO.update(user);
+    }
+
+    public void updateBalance(float amount) {
+        user.setBalance(user.getBalance() + amount);
+        userDAO.update(user);
     }
 
     public void manageAccountProcess() {
@@ -42,7 +43,63 @@ public class UserService {
         switch (choice) {
             case 1 -> handleChangeName();
             case 2 -> handleChangePassword();
-            case 3 -> {}
+            case 3 -> handleUpdateBalance();
+            case 4 -> {}
+        }
+    }
+
+    private void displayUserInfo() {
+        System.out.println("--- My Account ---");
+        System.out.println("Name: " + user.getName());
+        System.out.println("Email: " + user.getEmail());
+        System.out.println("Password: *****");
+        System.out.println("Balance: " + user.getBalance() + " UAH");
+    }
+
+    private int getManageAccountChoice() {
+        System.out.println("\n1-Change Name; 2-Change Password; 3-Update balance; 4-Exit");
+        System.out.print("Please select an option: ");
+        return getValidChoice(1, 4);
+    }
+
+    private void handleChangeName() {
+        System.out.print("Enter new name: ");
+        String newName = scanner.nextLine();
+        updateUserName(newName);
+        System.out.println("Name updated successfully.");
+    }
+
+    private void handleChangePassword() {
+        System.out.print("Enter current password: ");
+        String currentPassword = scanner.nextLine();
+        if (user.getPassword().equals(currentPassword)) {
+            String newPassword = getNewPassword();
+            updateUserPassword(newPassword);
+            System.out.println("Password updated successfully.");
+        } else {
+            System.out.println("Incorrect current password.");
+        }
+    }
+
+    private String getNewPassword() {
+        while (true) {
+            System.out.print("Enter new password: ");
+            String newPassword = scanner.nextLine();
+            System.out.print("Confirm new password: ");
+            String confirmPassword = scanner.nextLine();
+            if (newPassword.equals(confirmPassword)) {
+                return newPassword;
+            }
+            System.out.println("Passwords do not match. Please try again.");
+        }
+    }
+
+    private void handleUpdateBalance() {
+        displayBalanceInfo("Your current");
+        float amount = getValidAmount();
+        if (amount > 0) {
+            updateBalance(amount);
+            displayBalanceInfo("Balance updated successfully. Your new");
         }
     }
 
@@ -83,61 +140,5 @@ public class UserService {
             return false;
         }
         return true;
-    }
-
-    private void displayUserInfo() {
-        System.out.println("--- My Account ---");
-        System.out.println("Name: " + user.getName());
-        System.out.println("Email: " + user.getEmail());
-        System.out.println("Password: *****");
-        System.out.println("Balance: " + user.getBalance() + " UAH");
-    }
-
-    private int getManageAccountChoice() {
-        System.out.println("\n1-Change Name; 2-Change Password; 3-Exit");
-        System.out.print("Please select an option: ");
-        return getValidChoice(1, 3);
-    }
-
-    private void handleChangeName() {
-        System.out.print("Enter new name: ");
-        String newName = scanner.nextLine();
-        updateUserName(newName);
-        System.out.println("Name updated successfully.");
-    }
-
-    private void handleChangePassword() {
-        System.out.print("Enter current password: ");
-        String currentPassword = scanner.nextLine();
-        if (user.getPassword().equals(currentPassword)) {
-            String newPassword = getNewPassword();
-            updateUserPassword(newPassword);
-            System.out.println("Password updated successfully.");
-        } else {
-            System.out.println("Incorrect current password.");
-        }
-    }
-
-    private String getNewPassword() {
-        while (true) {
-            System.out.print("Enter new password: ");
-            String newPassword = scanner.nextLine();
-            System.out.print("Confirm new password: ");
-            String confirmPassword = scanner.nextLine();
-            if (newPassword.equals(confirmPassword)) {
-                return newPassword;
-            }
-            System.out.println("Passwords do not match. Please try again.");
-        }
-    }
-
-    private void updateUserName(String newName) {
-        user.setName(newName);
-        userDAO.update(user);
-    }
-
-    private void updateUserPassword(String newPassword) {
-        user.setPassword(newPassword);
-        userDAO.update(user);
     }
 }

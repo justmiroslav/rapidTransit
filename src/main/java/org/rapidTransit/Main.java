@@ -1,5 +1,6 @@
 package org.rapidTransit;
 
+import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.dao.*;
 import org.rapidTransit.model.User;
 import org.rapidTransit.model.Admin;
@@ -7,15 +8,18 @@ import org.rapidTransit.service.AuthenticationService;
 import org.rapidTransit.ui.UserMenu;
 import org.rapidTransit.ui.AdminMenu;
 
+import java.sql.Connection;
+
 public class Main {
     public static void main(String[] args) {
-        UserDAO userDAO = new UserDAOImpl();
-        AdminDAO adminDAO = new AdminDAOImpl();
-        TripDAO tripDAO = new TripDAOImpl();
-        TicketDAO ticketDAO = new TicketDAOImpl();
-        RouteDAO routeDAO = new RouteDAOImpl();
-        BusDAO busDAO = new BusDAOImpl();
-        RatingDAO ratingDAO = new RatingDAOImpl();
+        Connection connection = DatabaseConnection.getInstance().getConnection();
+        UserDAO userDAO = new UserDAOImpl(connection);
+        AdminDAO adminDAO = new AdminDAOImpl(connection);
+        TripDAO tripDAO = new TripDAOImpl(connection);
+        TicketDAO ticketDAO = new TicketDAOImpl(connection);
+        RouteDAO routeDAO = new RouteDAOImpl(connection);
+        BusDAO busDAO = new BusDAOImpl(connection);
+        RatingDAO ratingDAO = new RatingDAOImpl(connection);
         AuthenticationService authService = new AuthenticationService(userDAO, adminDAO);
 
         while (true) {

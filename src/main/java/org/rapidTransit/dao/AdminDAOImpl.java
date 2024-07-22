@@ -1,6 +1,5 @@
 package org.rapidTransit.dao;
 
-import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.model.Admin;
 
 import java.sql.*;
@@ -8,8 +7,8 @@ import java.sql.*;
 public class AdminDAOImpl implements AdminDAO {
     private final Connection connection;
 
-    public AdminDAOImpl() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
+    public AdminDAOImpl(Connection connection) {
+        this.connection = connection;
     }
 
     @Override

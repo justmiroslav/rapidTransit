@@ -1,7 +1,6 @@
 package org.rapidTransit.dao;
 
 import org.rapidTransit.model.Rating;
-import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.model.Route;
 import org.rapidTransit.model.User;
 
@@ -12,8 +11,8 @@ import java.util.ArrayList;
 public class RatingDAOImpl implements RatingDAO {
     private final Connection connection;
 
-    public RatingDAOImpl() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
+    public RatingDAOImpl(Connection connection) {
+        this.connection = connection;
         initializeSequence();
     }
 
@@ -50,13 +49,13 @@ public class RatingDAOImpl implements RatingDAO {
     @Override
     public List<User> getAllUsersWithRatings() {
         String sql = "SELECT * FROM users WHERE user_id IN (SELECT user_id FROM ratings) ORDER BY user_id ASC";
-        return findSomething(sql, stmt -> {}, this::mapResultSetToUser);
+        return findSomething(sql, _ -> {}, this::mapResultSetToUser);
     }
 
     @Override
     public List<Route> getAllRoutesWithRatings() {
         String sql = "SELECT * FROM routes WHERE route_id IN (SELECT route_id FROM trips WHERE trip_id IN (SELECT trip_id FROM ratings)) ORDER BY route_id ASC";
-        return findSomething(sql, stmt -> {}, this::mapResultSetToRoute);
+        return findSomething(sql, _ -> {}, this::mapResultSetToRoute);
     }
 
     private <T> List<T> findSomething(String sql, PreparedStatementSetter setter, ResultSetMapper<T> mapper) {

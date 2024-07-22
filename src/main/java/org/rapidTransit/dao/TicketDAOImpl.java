@@ -1,6 +1,5 @@
 package org.rapidTransit.dao;
 
-import org.rapidTransit.db.DatabaseConnection;
 import org.rapidTransit.model.Ticket;
 
 import java.sql.*;
@@ -10,8 +9,8 @@ import java.util.List;
 public class TicketDAOImpl implements TicketDAO {
     private final Connection connection;
 
-    public TicketDAOImpl() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
+    public TicketDAOImpl(Connection connection) {
+        this.connection = connection;
         initializeSequence();
     }
 

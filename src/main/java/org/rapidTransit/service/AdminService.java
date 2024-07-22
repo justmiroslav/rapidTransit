@@ -189,7 +189,7 @@ public class AdminService {
 
     private void addNewTrips() {
         List<Trip> trips = tripDAO.getLastTrips();
-        LocalDate lastTripDate = trips.get(trips.size() - 1).getTripDate();
+        LocalDate lastTripDate = trips.getLast().getTripDate();
 
         for (LocalDate date : List.of(lastTripDate.plusDays(1), lastTripDate.plusDays(2))) {
             trips.forEach(trip -> {
@@ -201,7 +201,7 @@ public class AdminService {
 
     private void addNewTrip(Trip trip, LocalDate date) {
         Bus bus = busDAO.findById(trip.getBusId());
-        tripDAO.save(new Trip(0, trip.getRouteId(), trip.getBusId(), date, trip.getDepartureTime(), trip.getArrivalTime(), generateAvailableSeats(bus.getSeatsCount())));
+        tripDAO.save(new Trip(0, trip.getRouteId(), trip.getBusId(), date, trip.getDepartureTime(), trip.getArrivalTime(), generateAvailableSeats(bus.seatsCount())));
     }
 
     private List<Integer> generateAvailableSeats(int seatsCount) {
