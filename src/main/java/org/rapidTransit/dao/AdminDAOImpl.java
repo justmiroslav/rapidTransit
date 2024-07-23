@@ -21,7 +21,7 @@ public class AdminDAOImpl implements AdminDAO {
                         rs.getString("admin_password"), rs.getString("admin_name"));
             }
         } catch (SQLException e) {
-            System.out.println("Error finding user: " + e.getMessage());
+            System.out.println(STR."Error finding user: \{e.getMessage()}");
         }
         return null;
     }

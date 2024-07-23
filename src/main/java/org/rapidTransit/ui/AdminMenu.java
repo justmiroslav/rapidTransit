@@ -15,7 +15,7 @@ public class AdminMenu {
     }
 
     public boolean show() {
-        System.out.println("Welcome to RapidTransit Admin Panel, " + admin.getName() + "!");
+        System.out.println(STR."Welcome to RapidTransit Admin Panel, \{admin.getName()}!");
         System.out.println("You have full access to manage the system. Please use your powers responsibly.");
 
         while (true) {

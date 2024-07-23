@@ -34,7 +34,7 @@ public class UserDAOImpl implements UserDAO {
                 users.add(createFromResultSet(rs));
             }
         } catch (SQLException e) {
-            System.out.println("Error getting all users: " + e.getMessage());
+            System.out.println(STR."Error getting all users: \{e.getMessage()}");
         }
         return users;
     }
@@ -49,7 +49,7 @@ public class UserDAOImpl implements UserDAO {
                 user.setId(rs.getLong(1));
             }
         } catch (SQLException e) {
-            System.out.println("Error saving user: " + e.getMessage());
+            System.out.println(STR."Error saving user: \{e.getMessage()}");
         }
     }
 
@@ -60,7 +60,7 @@ public class UserDAOImpl implements UserDAO {
             pstmt.setLong(6, user.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error updating user: " + e.getMessage());
+            System.out.println(STR."Error updating user: \{e.getMessage()}");
         }
     }
 
@@ -69,7 +69,7 @@ public class UserDAOImpl implements UserDAO {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Error initializing sequence: " + e.getMessage());
+            System.out.println(STR."Error initializing sequence: \{e.getMessage()}");
         }
     }
 
@@ -89,7 +89,7 @@ public class UserDAOImpl implements UserDAO {
                 return createFromResultSet(rs);
             }
         } catch (SQLException e) {
-            System.out.println("Error finding user: " + e.getMessage());
+            System.out.println(STR."Error finding user: \{e.getMessage()}");
         }
         return null;
     }

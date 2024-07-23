@@ -24,7 +24,7 @@ public class TicketDAOImpl implements TicketDAO {
                 ticket.setTicketId(rs.getLong(1));
             }
         } catch (SQLException e) {
-            System.out.println("Error saving ticket: " + e.getMessage());
+            System.out.println(STR."Error saving ticket: \{e.getMessage()}");
         }
     }
 
@@ -38,7 +38,7 @@ public class TicketDAOImpl implements TicketDAO {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            System.out.println("Error checking user tickets: " + e.getMessage());
+            System.out.println(STR."Error checking user tickets: \{e.getMessage()}");
         }
         return false;
     }
@@ -51,7 +51,7 @@ public class TicketDAOImpl implements TicketDAO {
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) tickets.add(createTicketFromResultSet(rs));
         } catch (SQLException e) {
-            System.out.println("Error finding user tickets: " + e.getMessage());
+            System.out.println(STR."Error finding user tickets: \{e.getMessage()}");
         }
         return tickets;
     }
@@ -73,7 +73,7 @@ public class TicketDAOImpl implements TicketDAO {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Error initializing sequence: " + e.getMessage());
+            System.out.println(STR."Error initializing sequence: \{e.getMessage()}");
         }
     }
 
@@ -90,7 +90,7 @@ public class TicketDAOImpl implements TicketDAO {
              ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) return createTicketFromResultSet(rs);
         } catch (SQLException e) {
-            System.out.println("Error finding ticket: " + e.getMessage());
+            System.out.println(STR."Error finding ticket: \{e.getMessage()}");
         }
         return null;
     }

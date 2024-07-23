@@ -35,7 +35,7 @@ public class RouteDAOImpl implements RouteDAO {
                 cities.add(rs.getString(1));
             }
         } catch (SQLException e) {
-            System.out.println("Error getting unique cities: " + e.getMessage());
+            System.out.println(STR."Error getting unique cities: \{e.getMessage()}");
         }
         return cities;
     }
@@ -51,7 +51,7 @@ public class RouteDAOImpl implements RouteDAO {
                         rs.getString("arrival_city"), rs.getFloat("travel_time")));
             }
         } catch (SQLException e) {
-            System.out.println("Error getting all routes: " + e.getMessage());
+            System.out.println(STR."Error getting all routes: \{e.getMessage()}");
         }
         return routes;
     }
@@ -66,7 +66,7 @@ public class RouteDAOImpl implements RouteDAO {
             pstmt.setInt(4, route.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error updating route: " + e.getMessage());
+            System.out.println(STR."Error updating route: \{e.getMessage()}");
         }
     }
 
@@ -81,7 +81,7 @@ public class RouteDAOImpl implements RouteDAO {
                         rs.getString("arrival_city"), rs.getFloat("travel_time"));
             }
         } catch (SQLException e) {
-            System.out.println("Error executing query: " + e.getMessage());
+            System.out.println(STR."Error executing query: \{e.getMessage()}");
         }
         return null;
     }

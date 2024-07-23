@@ -13,13 +13,13 @@ public class ProgramStart {
             createTables(stmt);
 
             for (String tableName : List.of("routes", "buses", "admins", "users", "trips")) {
-                insertDataFromFile(conn, "data/" + tableName + ".txt", tableName);
+                insertDataFromFile(conn, STR."data/\{tableName}.txt", tableName);
             }
 
             System.out.println("Data inserted successfully!");
 
         } catch (SQLException | IOException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(STR."Error: \{e.getMessage()}");
         }
     }
 
@@ -49,7 +49,7 @@ public class ProgramStart {
             case "admins" -> "INSERT INTO admins (admin_id, admin_email, admin_password, admin_name) VALUES (?, ?, ?, ?)";
             case "users" -> "INSERT INTO users (user_id, user_email, user_password, user_name, balance, is_blocked) VALUES (?, ?, ?, ?, ?, ?)";
             case "trips" -> "INSERT INTO trips (trip_id, route_id, bus_id, trip_date, departure_time, arrival_time, available_seats) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            default -> throw new IllegalArgumentException("Unsupported table: " + tableName);
+            default -> throw new IllegalArgumentException(STR."Unsupported table: \{tableName}");
         };
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -87,8 +87,8 @@ public class ProgramStart {
                         pstmt.setInt(2, Integer.parseInt(values[1]));
                         pstmt.setInt(3, Integer.parseInt(values[2]));
                         pstmt.setDate(4, Date.valueOf(values[3]));
-                        pstmt.setTime(5, Time.valueOf(values[4] + ":00"));
-                        pstmt.setTime(6, Time.valueOf(values[5] + ":00"));
+                        pstmt.setTime(5, Time.valueOf(STR."\{values[4]}:00"));
+                        pstmt.setTime(6, Time.valueOf(STR."\{values[5]}:00"));
                         pstmt.setArray(7, conn.createArrayOf("INTEGER", parseSeatsArray(values[6])));
                         break;
                 }

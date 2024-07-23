@@ -30,7 +30,7 @@ public class RatingDAOImpl implements RatingDAO {
                 rating.setRatingId(rs.getInt(1));
             }
         } catch (SQLException e) {
-            System.out.println("Error saving rating: " + e.getMessage());
+            System.out.println(STR."Error saving rating: \{e.getMessage()}");
         }
     }
 
@@ -68,7 +68,7 @@ public class RatingDAOImpl implements RatingDAO {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error executing query: " + e.getMessage());
+            System.out.println(STR."Error executing query: \{e.getMessage()}");
         }
         return results;
     }
@@ -78,7 +78,7 @@ public class RatingDAOImpl implements RatingDAO {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Error initializing sequence: " + e.getMessage());
+            System.out.println(STR."Error initializing sequence: \{e.getMessage()}");
         }
     }
     private Rating mapResultSetToRating(ResultSet rs) throws SQLException {

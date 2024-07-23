@@ -50,10 +50,10 @@ public class UserService {
 
     private void displayUserInfo() {
         System.out.println("--- My Account ---");
-        System.out.println("Name: " + user.getName());
-        System.out.println("Email: " + user.getEmail());
+        System.out.println(STR."Name: \{user.getName()}");
+        System.out.println(STR."Email: \{user.getEmail()}");
         System.out.println("Password: *****");
-        System.out.println("Balance: " + user.getBalance() + " UAH");
+        System.out.println(STR."Balance: \{user.getBalance()} UAH");
     }
 
     private int getManageAccountChoice() {

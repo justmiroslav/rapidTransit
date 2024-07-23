@@ -21,7 +21,7 @@ public class BusDAOImpl implements BusDAO {
                         rs.getInt("seats"));
             }
         } catch (SQLException e) {
-            System.out.println("Error executing query: " + e.getMessage());
+            System.out.println(STR."Error executing query: \{e.getMessage()}");
         }
         return null;
     }

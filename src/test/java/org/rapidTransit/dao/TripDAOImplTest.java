@@ -109,6 +109,20 @@ public class TripDAOImplTest {
     }
 
     @Test
+    public void testGetUniqueDates() throws SQLException {
+        // Arrange
+        int routeId = 1;
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getDate("trip_date")).thenReturn(Date.valueOf(LocalDate.now()));
+
+        // Act
+        List<LocalDate> dates = tripDAO.getUniqueDates(routeId);
+
+        // Assert
+        assertEquals(2, dates.size());
+    }
+
+    @Test
     public void testUpdate() throws SQLException {
         // Arrange
         Trip trip = new Trip(1L, 1, 1, LocalDate.now(), LocalTime.now(), LocalTime.now(), Arrays.asList(1, 2, 3));

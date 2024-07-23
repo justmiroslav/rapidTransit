@@ -10,6 +10,7 @@ public interface TripDAO {
     Trip findByRouteAndDate(int routeId, LocalDate date);
     List<Trip> findByRouteId(int routeId);
     List<Trip> getLastTrips();
+    List<LocalDate> getUniqueDates(int routeId);
     boolean tripExists(int routeId, LocalDate date);
     void update(Trip trip);
     void save(Trip trip);

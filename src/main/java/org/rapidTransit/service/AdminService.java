@@ -94,12 +94,12 @@ public class AdminService {
 
     private void toggleUserBlock(User user, boolean block) {
         if (user == null || user.isBlocked() == block) {
-            System.out.println("User not found or already " + (block ? "blocked." : "unblocked."));
+            System.out.println(STR."User not found or already \{block ? "blocked." : "unblocked."}");
             return;
         }
         user.setBlocked(block);
         userDAO.update(user);
-        System.out.println("User " + (block ? "blocked" : "unblocked") + " successfully.");
+        System.out.println(STR."User \{block ? "blocked" : "unblocked"} successfully.");
     }
 
     private void changeRouteTime() {

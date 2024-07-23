@@ -20,7 +20,7 @@ public class UserMenu {
     }
 
     public boolean show() {
-        System.out.println("Welcome to RapidTransit, " + user.getName() + "!");
+        System.out.println(STR."Welcome to RapidTransit, \{user.getName()}!");
         System.out.println("We're glad to have you on board. Enjoy comfortable and efficient bus travel across Ukraine.");
 
         while (true) {

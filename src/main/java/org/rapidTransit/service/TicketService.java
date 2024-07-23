@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.AbstractMap.SimpleEntry;
 import java.time.Year;
+import java.util.stream.Collectors;
 
 public class TicketService {
     private final User user;
@@ -33,8 +34,9 @@ public class TicketService {
         SimpleEntry<String, String> cities = selectCities(routeDAO.getUniqueCities());
         if (cities == null) return 0;
 
-        LocalDate tripDate = selectDate();
         Route route = routeDAO.findRouteId(cities.getKey(), cities.getValue());
+        LocalDate tripDate = selectDate(route.getId());
+        if (tripDate == null) return 0;
 
         Trip trip = findTrip(route, tripDate);
         if (trip == null) return 0;
@@ -53,7 +55,7 @@ public class TicketService {
     }
 
     private SimpleEntry<String, String> selectCities(List<String> availableCities) {
-        System.out.println("Available cities: " + String.join(", ", availableCities));
+        System.out.println(STR."Available cities: \{String.join(", ", availableCities)}");
         System.out.print("Enter departure city: ");
         String departureCity = scanner.nextLine();
         System.out.print("Enter arrival city: ");
@@ -66,12 +68,15 @@ public class TicketService {
         return new SimpleEntry<>(departureCity, arrivalCity);
     }
 
-    private LocalDate selectDate() {
+    private LocalDate selectDate(int routeId) {
+        boolean isOk = displayValidDates(tripDAO.getUniqueDates(routeId));
+        if (!isOk) return null;
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd:MM:yyyy");
         LocalDate date = null;
         while (date == null) {
             System.out.print("Enter date (dd:MM): ");
-            String input = scanner.nextLine() + ":" + Year.now().getValue();
+            String input = STR."\{scanner.nextLine()}:\{Year.now().getValue()}";
             try {
                 date = LocalDate.parse(input, formatter);
             } catch (Exception e) {
@@ -79,6 +84,18 @@ public class TicketService {
             }
         }
         return date;
+    }
+
+    private boolean displayValidDates(List<LocalDate> dates) {
+        if (dates.isEmpty()) {
+            System.out.println("No trips available for this route. Please try again.");
+            return false;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd:MM");
+        String formattedDates = dates.stream().map(date -> date.format(formatter)).collect(Collectors.joining(", "));
+        System.out.println(STR."Available dates: \{formattedDates}");
+        return true;
     }
 
     private Trip findTrip(Route route, LocalDate tripDate) {
@@ -136,8 +153,8 @@ public class TicketService {
 
     private void displayTripInfo(Bus bus, Trip trip) {
         System.out.println("\n--- Quick info about the trip ---");
-        System.out.println("Bus number: " + bus.busNumber() + ", Trip time: (" + trip.getDepartureTime() + " - " + trip.getArrivalTime() + ")");
-        System.out.println("Available seats: " + String.join(", ", trip.getAvailableSeats().toString()));
+        System.out.println(STR."Bus number: \{bus.busNumber()}, Trip time: (\{trip.getDepartureTime()} - \{trip.getArrivalTime()})");
+        System.out.println(STR."Available seats: \{String.join(", ", trip.getAvailableSeats().toString())}");
     }
 
     private float calculatePrice(Route route) {

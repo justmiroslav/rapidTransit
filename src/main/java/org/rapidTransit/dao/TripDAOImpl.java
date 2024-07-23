@@ -40,6 +40,22 @@ public class TripDAOImpl implements TripDAO {
     }
 
     @Override
+    public List<LocalDate> getUniqueDates(int routeId) {
+        String sql = "SELECT DISTINCT trip_date FROM trips WHERE route_id = ? ORDER BY trip_date ASC";
+        List<LocalDate> uniqueDates = new ArrayList<>();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, routeId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                uniqueDates.add(rs.getDate("trip_date").toLocalDate());
+            }
+        } catch (SQLException e) {
+            System.out.println(STR."Error getting unique dates: \{e.getMessage()}");
+        }
+        return uniqueDates;
+    }
+
+    @Override
     public boolean tripExists(int routeId, LocalDate date) {
         String sql = "SELECT * FROM trips WHERE route_id = ? AND trip_date = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -48,7 +64,7 @@ public class TripDAOImpl implements TripDAO {
             ResultSet rs = pstmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
-            System.out.println("Error checking if trip exists: " + e.getMessage());
+            System.out.println(STR."Error checking if trip exists: \{e.getMessage()}");
         }
         return false;
     }
@@ -60,7 +76,7 @@ public class TripDAOImpl implements TripDAO {
             pstmt.setLong(7, trip.getTripId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error updating trip: " + e.getMessage());
+            System.out.println(STR."Error updating trip: \{e.getMessage()}");
         }
     }
 
@@ -74,7 +90,7 @@ public class TripDAOImpl implements TripDAO {
                 trip.setTripId(rs.getLong(1));
             }
         } catch (SQLException e) {
-            System.out.println("Error saving trip: " + e.getMessage());
+            System.out.println(STR."Error saving trip: \{e.getMessage()}");
         }
     }
 
@@ -94,7 +110,7 @@ public class TripDAOImpl implements TripDAO {
                 return createTripFromResultSet(rs);
             }
         } catch (SQLException e) {
-            System.out.println("Error executing query: " + e.getMessage());
+            System.out.println(STR."Error executing query: \{e.getMessage()}");
         }
         return null;
     }
@@ -119,7 +135,7 @@ public class TripDAOImpl implements TripDAO {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Error initializing sequence: " + e.getMessage());
+            System.out.println(STR."Error initializing sequence: \{e.getMessage()}");
         }
     }
 
@@ -130,7 +146,7 @@ public class TripDAOImpl implements TripDAO {
                 trips.add(createTripFromResultSet(rs));
             }
         } catch (SQLException e) {
-            System.out.println("Error executing query: " + e.getMessage());
+            System.out.println(STR."Error executing query: \{e.getMessage()}");
         }
         return trips;
     }

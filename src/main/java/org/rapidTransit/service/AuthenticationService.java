@@ -37,8 +37,10 @@ public class AuthenticationService {
             if (params[0].equals("exit") || params[1].equals("exit")) return null;
             paramsList = List.of(params);
         } else {
-            email = promptUser("Enter your email: "); password = promptUser("Enter your password: ");
-            if (email == null || password == null) return null;
+            email = promptUser("Enter your email: ");
+            if (email == null) return null;
+            password = promptUser("Enter your password: ");
+            if (password == null) return null;
             paramsList = List.of(email, password);
         }
 

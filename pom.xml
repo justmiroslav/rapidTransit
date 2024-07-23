@@ -47,6 +47,7 @@
 
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -56,6 +57,7 @@
           <target>${maven.compiler.target}</target>
           <compilerArgs>
             <arg>--enable-preview</arg>
+            <arg>-Xlint:preview</arg>
           </compilerArgs>
         </configuration>
       </plugin>
@@ -66,35 +68,91 @@
         <version>3.3.0</version>
         <configuration>
           <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>org.rapidTransit.Main</mainClass>
-            </manifest>
+            <manifestEntries>
+              <Add-Opens>java.base/java.lang</Add-Opens>
+            </manifestEntries>
           </archive>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>org.rapidTransit.Main</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.2</version>
+        <configuration>
+          <argLine>--enable-preview</argLine>
+        </configuration>
       </plugin>
+
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>main-app</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <transformers>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <mainClass>org.rapidTransit.Main</mainClass>
+                    </transformer>
+                  </transformers>
+                  <finalName>rapidTransit-main-${project.version}</finalName>
+                  <outputFile>${project.build.directory}/rapidTransit-main-${project.version}.jar</outputFile>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <shadedClassifierName>main</shadedClassifierName>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>db-init</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <transformers>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <mainClass>org.dbCreation.ProgramStart</mainClass>
+                    </transformer>
+                  </transformers>
+                  <finalName>rapidTransit-db-init-${project.version}</finalName>
+                  <outputFile>${project.build.directory}/rapidTransit-db-init-${project.version}.jar</outputFile>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <shadedClassifierName>db-init</shadedClassifierName>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
