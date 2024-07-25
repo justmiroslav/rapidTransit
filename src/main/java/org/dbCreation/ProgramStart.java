@@ -6,11 +6,18 @@ import java.sql.*;
 import java.nio.file.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.IntStream;
 
 public class ProgramStart {
+    private static final Map<Integer, Integer> busSeats = new HashMap<>();
+
     public static void main() {
         try (Connection conn = new DatabaseConnection().getConnection(); Statement stmt = conn.createStatement()) {
             createTables(stmt);
+
+            loadBusSeats();
 
             for (String tableName : List.of("routes", "buses", "admins", "users", "trips")) {
                 insertDataFromFile(conn, STR."data/\{tableName}.txt", tableName);
@@ -23,13 +30,19 @@ public class ProgramStart {
         }
     }
 
-    private static Integer[] parseSeatsArray(String seats) {
-        String[] seatsArray = seats.substring(1, seats.length() - 1).split("; ");
-        Integer[] result = new Integer[seatsArray.length];
-        for (int i = 0; i < seatsArray.length; i++) {
-            result[i] = Integer.parseInt(seatsArray[i]);
+    private static void loadBusSeats() throws IOException {
+        List<String> lines = Files.readAllLines(Paths.get("data/buses.txt"));
+        for (String line : lines) {
+            String[] values = line.split(",");
+            int busId = Integer.parseInt(values[0]);
+            int seats = Integer.parseInt(values[1]);
+            busSeats.put(busId, seats);
         }
-        return result;
+    }
+
+    private static Integer[] generateAvailableSeats(int busId) {
+        int seats = busSeats.getOrDefault(busId, 0);
+        return IntStream.rangeClosed(1, seats).boxed().toArray(Integer[]::new);
     }
 
     private static void createTables(Statement stmt) throws SQLException {
@@ -83,13 +96,14 @@ public class ProgramStart {
                         pstmt.setBoolean(6, Boolean.parseBoolean(values[5]));
                         break;
                     case "trips":
+                        int busId = Integer.parseInt(values[2]);
                         pstmt.setLong(1, Long.parseLong(values[0]));
                         pstmt.setInt(2, Integer.parseInt(values[1]));
-                        pstmt.setInt(3, Integer.parseInt(values[2]));
+                        pstmt.setInt(3, busId);
                         pstmt.setDate(4, Date.valueOf(values[3]));
                         pstmt.setTime(5, Time.valueOf(STR."\{values[4]}:00"));
                         pstmt.setTime(6, Time.valueOf(STR."\{values[5]}:00"));
-                        pstmt.setArray(7, conn.createArrayOf("INTEGER", parseSeatsArray(values[6])));
+                        pstmt.setArray(7, conn.createArrayOf("INTEGER", generateAvailableSeats(busId)));
                         break;
                 }
                 pstmt.executeUpdate();

@@ -61,7 +61,8 @@ public class ManageRoutesService {
     private void displayCurrentTravelTime(Route route) {
         int hours = (int) route.getTravelTime();
         int minutes = (int) ((route.getTravelTime() - hours) * 60);
-        System.out.printf("Current travel time takes %d hours and %02d minutes.\n", hours, minutes);
+        if (minutes == 0) System.out.printf("Current travel time takes %d hours.\n", hours);
+        else System.out.printf("Current travel time takes %d hours and %02d minutes.\n", hours, minutes);
     }
 
     private void updateRoutesTime(Route route, float newTravelTime) {
