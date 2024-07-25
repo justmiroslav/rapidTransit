@@ -12,7 +12,7 @@ import java.sql.Connection;
 
 public class Main {
     public static void main(String[] args) {
-        Connection connection = DatabaseConnection.getInstance().getConnection();
+        Connection connection = new DatabaseConnection().getConnection();
         UserDAO userDAO = new UserDAOImpl(connection);
         AdminDAO adminDAO = new AdminDAOImpl(connection);
         TripDAO tripDAO = new TripDAOImpl(connection);

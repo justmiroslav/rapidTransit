@@ -2,25 +2,33 @@ package org.rapidTransit.ui;
 
 import org.rapidTransit.model.Admin;
 import org.rapidTransit.dao.*;
-import org.rapidTransit.service.AdminService;
+import org.rapidTransit.service.ManageRatingsService;
+import org.rapidTransit.service.ManageRoutesService;
+import org.rapidTransit.service.ManageUsersService;
+import org.rapidTransit.util.Utils;
 
+import java.util.Scanner;
 
 public class AdminMenu {
     private final Admin admin;
-    private final AdminService adminService;
+    private final ManageUsersService manageUsersService;
+    private final ManageRoutesService manageRoutesService;
+    private final ManageRatingsService manageRatingsService;
 
     public AdminMenu(Admin admin, RouteDAO routeDAO, BusDAO busDAO, TripDAO tripDAO, UserDAO userDAO, RatingDAO ratingDAO) {
         this.admin = admin;
-        this.adminService = new AdminService(routeDAO, busDAO, tripDAO, userDAO, ratingDAO);
+        this.manageUsersService = new ManageUsersService(userDAO);
+        this.manageRoutesService = new ManageRoutesService(routeDAO, tripDAO, busDAO);
+        this.manageRatingsService = new ManageRatingsService(routeDAO, tripDAO, userDAO, ratingDAO);
     }
 
     public boolean show() {
+        Scanner scanner = new Scanner(System.in);
         System.out.println(STR."Welcome to RapidTransit Admin Panel, \{admin.getName()}!");
         System.out.println("You have full access to manage the system. Please use your powers responsibly.");
 
         while (true) {
-            displayMainMenu();
-            int choice = adminService.getValidChoice(1, 5);
+            int choice = Utils.getChoice(scanner, "\n1-Manage Users; 2-Manage Routes; 3-Check Reports; 4-Log out; 5-Exit", 5);
 
             switch (choice) {
                 case 1 -> handleManageUsers();
@@ -32,20 +40,15 @@ public class AdminMenu {
         }
     }
 
-    private void displayMainMenu() {
-        System.out.println("\n1-Manage Users; 2-Manage Routes; 3-Check Reports; 4-Log out; 5-Exit");
-        System.out.print("Please select an option: ");
-    }
-
     private void handleManageUsers() {
-        adminService.manageUsersProcess();
+        manageUsersService.manageUsersProcess();
     }
 
     private void handleManageRoutes() {
-        adminService.manageRoutesProcess();
+        manageRoutesService.manageRoutesProcess();
     }
 
     private void handleCheckReports() {
-        adminService.checkReportsProcess();
+        manageRatingsService.checkReportsProcess();
     }
 }

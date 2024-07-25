@@ -2,6 +2,7 @@ package org.rapidTransit.service;
 
 import org.rapidTransit.model.*;
 import org.rapidTransit.dao.*;
+import org.rapidTransit.util.Utils;
 
 import java.util.List;
 import java.util.Scanner;
@@ -45,21 +46,19 @@ public class TicketService {
         displayTripInfo(bus, trip);
 
         int seatNumber = selectSeat(trip);
-        if (seatNumber == -1) return 0;
+        if (seatNumber == 0) return 0;
 
-        if (!checkBalanceAndCalculatePrice(route)) return 0;
+        float price = checkBalanceAndCalculatePrice(route);
+        if (price == 0) return 0;
 
-        float price = calculatePrice(route);
         purchaseAndDisplayTicket(seatNumber, price, bus, trip, route);
         return price;
     }
 
     private SimpleEntry<String, String> selectCities(List<String> availableCities) {
         System.out.println(STR."Available cities: \{String.join(", ", availableCities)}");
-        System.out.print("Enter departure city: ");
-        String departureCity = scanner.nextLine();
-        System.out.print("Enter arrival city: ");
-        String arrivalCity = scanner.nextLine();
+        String departureCity = Utils.getValidString(scanner, "Enter departure city: ");
+        String arrivalCity = Utils.getValidString(scanner, "Enter arrival city: ");
 
         if (!validateCities(availableCities, departureCity, arrivalCity)) {
             System.out.println("Invalid cities. Please try again.");
@@ -75,8 +74,7 @@ public class TicketService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd:MM:yyyy");
         LocalDate date = null;
         while (date == null) {
-            System.out.print("Enter date (dd:MM): ");
-            String input = STR."\{scanner.nextLine()}:\{Year.now().getValue()}";
+            String input = STR."\{Utils.getValidString(scanner, "Enter date (dd:MM): ")}:\{Year.now().getValue()}";
             try {
                 date = LocalDate.parse(input, formatter);
             } catch (Exception e) {
@@ -107,37 +105,29 @@ public class TicketService {
     }
 
     private int selectSeat(Trip trip) {
-        System.out.print("Enter seat number: ");
-        while (!scanner.hasNextInt()) {
-            System.out.println("Value must be an integer. Please try again.");
-            scanner.next();
-        }
-        int seatNumber = scanner.nextInt();
-        scanner.nextLine();
+        int seatNumber = (int) Utils.getValidNumber(scanner, "Enter seat number: ");
         if (!trip.getAvailableSeats().contains(seatNumber)) {
             System.out.println("Invalid seat number");
-            return -1;
+            return 0;
         }
         return seatNumber;
     }
 
-    private boolean checkBalanceAndCalculatePrice(Route route) {
-        float price = calculatePrice(route);
+    private float checkBalanceAndCalculatePrice(Route route) {
+        float price = route.getTravelTime() * COEFFICIENT;
         boolean isConfirmed = confirmPayment(price);
-        if (!isConfirmed) return false;
+        if (!isConfirmed) return 0;
         if (user.getBalance() < price) {
             System.out.println("Insufficient balance. Please add funds to your account.");
-            return false;
+            return 0;
         }
-        return true;
+        return price;
     }
 
     private boolean confirmPayment(float price) {
-        System.out.printf("This trip will cost you %.2f UAH. Are you ready to pay? (yes/no): ", price);
-        String response = scanner.nextLine().trim().toLowerCase();
+        String response = Utils.getValidString(scanner, STR."This trip will cost you \{price} UAH. Are you ready to pay? (yes/no): ").trim().toLowerCase();
         while (!response.equals("yes") && !response.equals("no")) {
-            System.out.print("Invalid input. Please enter 'yes' or 'no': ");
-            response = scanner.nextLine().trim().toLowerCase();
+            response = Utils.getValidString(scanner, "Invalid input. Please enter 'yes' or 'no': ").trim().toLowerCase();
         }
         return response.equals("yes");
     }
@@ -155,10 +145,6 @@ public class TicketService {
         System.out.println("\n--- Quick info about the trip ---");
         System.out.println(STR."Bus number: \{bus.busNumber()}, Trip time: (\{trip.getDepartureTime()} - \{trip.getArrivalTime()})");
         System.out.println(STR."Available seats: \{String.join(", ", trip.getAvailableSeats().toString())}");
-    }
-
-    private float calculatePrice(Route route) {
-        return route.getTravelTime() * COEFFICIENT;
     }
 
     private long purchaseTicket(Trip trip, int seatNumber, float price) {

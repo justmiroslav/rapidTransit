@@ -4,11 +4,13 @@ import org.rapidTransit.dao.UserDAO;
 import org.rapidTransit.dao.AdminDAO;
 import org.rapidTransit.model.User;
 import org.rapidTransit.model.Admin;
+import org.rapidTransit.util.Utils;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class AuthenticationService {
+    private static final String EXIT_COMMAND = "exit";
     private final UserDAO userDAO;
     private final AdminDAO adminDAO;
     private final Scanner scanner;
@@ -34,7 +36,7 @@ public class AuthenticationService {
         List<String> paramsList;
 
         if (params.length >= 2) {
-            if (params[0].equals("exit") || params[1].equals("exit")) return null;
+            if (params[0].equals(EXIT_COMMAND) || params[1].equals(EXIT_COMMAND)) return null;
             paramsList = List.of(params);
         } else {
             email = promptUser("Enter your email: ");
@@ -71,7 +73,7 @@ public class AuthenticationService {
         String email = credentials.get(0);
         String password = credentials.get(1);
 
-        if (email.equals("exit") || password.equals("exit")) return null;
+        if (email.equals(EXIT_COMMAND) || password.equals(EXIT_COMMAND)) return null;
 
         String confirmPassword = (credentials.size() > 2) ? credentials.get(2) : promptUser("Confirm your password: ");
         if (!password.equals(confirmPassword)) {
@@ -88,9 +90,8 @@ public class AuthenticationService {
     }
 
     private String promptUser(String message) {
-        System.out.print(message);
-        String input = scanner.nextLine();
-        return input.equals("exit") ? null : input;
+        String input = Utils.getValidString(scanner, message);
+        return input.equals(EXIT_COMMAND) ? null : input;
     }
 
     private Object handleBlockedUser() {

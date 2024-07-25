@@ -1,10 +1,13 @@
 package org.rapidTransit.ui;
 
 import org.rapidTransit.model.User;
+import org.rapidTransit.util.Utils;
 import org.rapidTransit.service.UserService;
 import org.rapidTransit.service.TicketService;
 import org.rapidTransit.service.TripService;
 import org.rapidTransit.dao.*;
+
+import java.util.Scanner;
 
 public class UserMenu {
     private final User user;
@@ -20,12 +23,12 @@ public class UserMenu {
     }
 
     public boolean show() {
+        Scanner scanner = new Scanner(System.in);
         System.out.println(STR."Welcome to RapidTransit, \{user.getName()}!");
         System.out.println("We're glad to have you on board. Enjoy comfortable and efficient bus travel across Ukraine.");
 
         while (true) {
-            displayMainMenu();
-            int choice = userService.getValidChoice(1, 7);
+            int choice = Utils.getChoice(scanner, "\n1-Purchase Tickets; 2-Trips History; 3-Manage Account; 4-About Us; 5-Log out; 6-Exit", 6);
 
             switch (choice) {
                 case 1 -> handlePurchaseTickets();
@@ -36,11 +39,6 @@ public class UserMenu {
                 case 6 -> { System.out.println("Thank you for using RapidTransit. Goodbye!"); return false; }
             }
         }
-    }
-
-    private void displayMainMenu() {
-        System.out.println("\n1-Purchase Tickets; 2-Trips History; 3-Manage Account; 4-About Us; 5-Log out; 6-Exit");
-        System.out.print("Please select an option: ");
     }
 
     private void handlePurchaseTickets() {

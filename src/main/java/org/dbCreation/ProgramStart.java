@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ProgramStart {
     public static void main() {
-        try (Connection conn = DatabaseConnection.getInstance().getConnection(); Statement stmt = conn.createStatement()) {
+        try (Connection conn = new DatabaseConnection().getConnection(); Statement stmt = conn.createStatement()) {
             createTables(stmt);
 
             for (String tableName : List.of("routes", "buses", "admins", "users", "trips")) {

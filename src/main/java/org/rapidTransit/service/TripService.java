@@ -52,9 +52,7 @@ public class TripService {
     }
 
     private void handleTripHistoryCommands() {
-        System.out.println("\n1-Ticket Details; 2-Rate Trip; 3-Exit");
-        System.out.print("Please select an option: ");
-        int choice = getValidChoice(3);
+        int choice = Utils.getDefaultChoice(scanner, "\n1-Ticket Details; 2-Rate Trip; 3-Exit");
         switch (choice) {
             case 1 -> displayTicketDetails();
             case 2 -> rateTrip();
@@ -63,7 +61,7 @@ public class TripService {
     }
 
     private void displayTicketDetails() {
-        long ticketId = getValidId("Enter ticket id: ");
+        long ticketId = Utils.getValidNumber(scanner, "Enter ticket id: ");
         Ticket ticket = ticketDAO.findById(ticketId);
         if (ticket == null) {
             System.out.println("Ticket not found");
@@ -83,36 +81,21 @@ public class TripService {
     }
 
     private void rateTrip() {
-        long tripId = getValidId("Enter trip id: ");
+        long tripId = Utils.getValidNumber(scanner, "Enter trip id: ");
         if (tripId == 0) return;
         if (ticketDAO.findByTripAndUser(tripId, user.getId()) == null) {
             System.out.println("You haven't been in this trip");
             return;
         }
         System.out.print("Enter rating (1-5): ");
-        int rating = getValidChoice(5);
+        int rating = Utils.getValidChoice(1, 5, scanner);
         String comment = getComment();
         ratingDAO.save(new Rating(0, tripId, user.getId(), rating, comment));
         System.out.println("Thank you for sharing your trip experience!");
     }
 
-    private long getValidId(String message) {
-        System.out.print(message);
-        try {
-            return Long.parseLong(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid number.");
-            return 0;
-        }
-    }
-
     private String getComment() {
-        System.out.print("Enter comment (or '-' for default): ");
-        String comment = scanner.nextLine();
+        String comment = Utils.getValidString(scanner, "Enter comment (or '-' for default): ");
         return comment.equals("-") ? "The rating I provided speaks for itself" : comment;
-    }
-
-    private int getValidChoice(int max) {
-        return Utils.getValidChoice(1, max, scanner);
     }
 }

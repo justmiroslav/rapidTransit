@@ -5,7 +5,6 @@ import org.rapidTransit.model.User;
 import org.rapidTransit.util.Utils;
 
 import java.util.Scanner;
-import java.util.Optional;
 
 public class UserService {
     private final User user;
@@ -16,10 +15,6 @@ public class UserService {
         this.user = user;
         this.userDAO = userDAO;
         this.scanner = new Scanner(System.in);
-    }
-
-    public int getValidChoice(int min, int max) {
-        return Utils.getValidChoice(min, max, scanner);
     }
 
     public void updateUserName(String newName) {
@@ -39,7 +34,7 @@ public class UserService {
 
     public void manageAccountProcess() {
         displayUserInfo();
-        int choice = getManageAccountChoice();
+        int choice = Utils.getChoice(scanner, "\n1-Change Name; 2-Change Password; 3-Update balance; 4-Exit", 4);
         switch (choice) {
             case 1 -> handleChangeName();
             case 2 -> handleChangePassword();
@@ -56,22 +51,14 @@ public class UserService {
         System.out.println(STR."Balance: \{user.getBalance()} UAH");
     }
 
-    private int getManageAccountChoice() {
-        System.out.println("\n1-Change Name; 2-Change Password; 3-Update balance; 4-Exit");
-        System.out.print("Please select an option: ");
-        return getValidChoice(1, 4);
-    }
-
     private void handleChangeName() {
-        System.out.print("Enter new name: ");
-        String newName = scanner.nextLine();
+        String newName = Utils.getValidString(scanner, "Enter new name: ");
         updateUserName(newName);
         System.out.println("Name updated successfully.");
     }
 
     private void handleChangePassword() {
-        System.out.print("Enter current password: ");
-        String currentPassword = scanner.nextLine();
+        String currentPassword = Utils.getValidString(scanner, "Enter current password: ");
         if (user.getPassword().equals(currentPassword)) {
             String newPassword = getNewPassword();
             updateUserPassword(newPassword);
@@ -83,10 +70,8 @@ public class UserService {
 
     private String getNewPassword() {
         while (true) {
-            System.out.print("Enter new password: ");
-            String newPassword = scanner.nextLine();
-            System.out.print("Confirm new password: ");
-            String confirmPassword = scanner.nextLine();
+            String newPassword = Utils.getValidString(scanner, "Enter new password: ");
+            String confirmPassword = Utils.getValidString(scanner, "Confirm new password: ");
             if (newPassword.equals(confirmPassword)) {
                 return newPassword;
             }
@@ -100,6 +85,8 @@ public class UserService {
         if (amount > 0) {
             updateBalance(amount);
             displayBalanceInfo("Balance updated successfully. Your new");
+        } else {
+            System.out.println("Invalid amount. Balance update cancelled.");
         }
     }
 
@@ -108,37 +95,15 @@ public class UserService {
     }
 
     private float getValidAmount() {
-        while (true) {
-            String input = readUserInput();
-            if (input.equalsIgnoreCase("exit")) {
-                return 0;
-            }
-            Optional<Float> amount = parseAmount(input);
-            if (amount.isPresent() && isPositiveAmount(amount.get())) {
-                return amount.get();
-            }
+        String input = Utils.getValidString(scanner, "Enter the amount to add (or 'exit' to cancel): ");
+        if (input.equalsIgnoreCase("exit")) {
+            return 0;
         }
-    }
 
-    private String readUserInput() {
-        System.out.print("Enter the amount to add (or 'exit' to cancel): ");
-        return scanner.nextLine();
-    }
-
-    private Optional<Float> parseAmount(String input) {
         try {
-            return Optional.of(Float.parseFloat(input));
+            return Float.parseFloat(input);
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid number.");
-            return Optional.empty();
+            return 0;
         }
-    }
-
-    private boolean isPositiveAmount(float amount) {
-        if (amount <= 0) {
-            System.out.println("Amount must be positive.");
-            return false;
-        }
-        return true;
     }
 }
